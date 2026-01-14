@@ -1,0 +1,6 @@
+AGENTS.md
+**/.terraform/*
+.env
+gitops/platform/karpenter/karpenter.yaml
+gitops/logging/fluent-bit-values.yaml
+gitops/argocd/applications/hello-nginx.yaml

@@ -1,0 +1,37 @@
+serviceAccount:
+  create: true
+  name: ${FLUENT_BIT_SERVICE_ACCOUNT}
+
+config:
+  service: |
+    [SERVICE]
+        Flush        1
+        Log_Level    info
+        HTTP_Server  On
+        HTTP_Listen  0.0.0.0
+        HTTP_Port    2020
+  inputs: |
+    [INPUT]
+        Name              tail
+        Path              /var/log/containers/*.log
+        Tag               kube.*
+        Parser            docker
+        Mem_Buf_Limit     5MB
+        Skip_Long_Lines   On
+  filters: |
+    [FILTER]
+        Name                kubernetes
+        Match               kube.*
+        Kube_Tag_Prefix      kube.var.log.containers.
+        Merge_Log           On
+        Keep_Log            Off
+        K8S-Logging.Parser  On
+        K8S-Logging.Exclude Off
+  outputs: |
+    [OUTPUT]
+        Name              cloudwatch_logs
+        Match             kube.*
+        region            ${AWS_REGION}
+        log_group_name    ${LOG_GROUP_NAME}
+        log_stream_prefix fluent-bit-
+        auto_create_group true
