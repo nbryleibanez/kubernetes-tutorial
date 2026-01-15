@@ -12,6 +12,13 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: apps
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      name: hello-nginx
+      namespace: apps
+      jsonPointers:
+        - /spec/replicas
   syncPolicy:
     automated:
       prune: true

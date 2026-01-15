@@ -15,6 +15,7 @@ spec:
       labels:
         app: hello-nginx
     spec:
+      serviceAccountName: hello-nginx
       containers:
         - name: nginx
           image: nginx:1.27-alpine

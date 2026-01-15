@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: hello-nginx-read
+  namespace: apps
+subjects:
+  - kind: ServiceAccount
+    name: hello-nginx
+    namespace: apps
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: hello-nginx-read
