@@ -16,6 +16,7 @@ This guide teaches beginner-intermediate DevOps/Platform engineers how to build 
 - Karpenter for dynamic, cost-aware compute
 - Prometheus + Grafana for metrics and dashboards
 - Fluent Bit for log shipping to CloudWatch
+- Argo CD for GitOps-driven delivery and drift correction
 
 ## Why This Stack
 
@@ -24,6 +25,7 @@ This guide teaches beginner-intermediate DevOps/Platform engineers how to build 
 - **Karpenter**: scales nodes based on pod scheduling pressure, not fixed groups.
 - **Prometheus/Grafana**: standard OSS monitoring stack with flexible dashboards.
 - **Fluent Bit**: lightweight, reliable log forwarder.
+- **Argo CD**: GitOps engine that keeps the cluster aligned with Git.
 
 ## Prerequisites
 
