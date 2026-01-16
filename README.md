@@ -167,7 +167,7 @@ locals {
     Environment      = local.common.environment
     Project          = local.common.project_name
     TerraformManaged = true
-}
+  }
 }
 ```
 
@@ -415,6 +415,24 @@ Expected: nodes are in `Ready` state.
 
 Why this matters: confirms your kubeconfig points at the new cluster.
 
+## Install Karpenter (Helm)
+
+Why: installs the controller that watches pending pods and creates nodes.
+
+```bash
+helm upgrade --install karpenter oci://public.ecr.aws/karpenter/karpenter \
+  --version "$KARPENTER_CHART_VERSION" \
+  --namespace karpenter \
+  --create-namespace \
+  --set "settings.clusterName=$EKS_CLUSTER_NAME" \
+  --set "settings.clusterEndpoint=$(aws eks describe-cluster \
+    --name "$EKS_CLUSTER_NAME" \
+    --region "$AWS_REGION" \
+    --query "cluster.endpoint" --output text)"
+```
+
+Expected: `kubectl -n karpenter get pods` shows the controller running.
+
 ## Karpenter Configuration (Manifests)
 
 Create `gitops/platform/karpenter/karpenter.yaml.tmpl`:
@@ -489,30 +507,6 @@ Expected: you should see a `default` EC2NodeClass and NodePool.
 > Practice note: Karpenter works because pods have resource requests. Without
 > requests, the scheduler has no signal to trigger capacity.
 
-## Install Karpenter (Helm)
-
-Why: installs the controller that watches pending pods and creates nodes.
-
-```bash
-helm repo add karpenter https://charts.karpenter.sh
-helm repo update
-
-helm upgrade --install karpenter karpenter/karpenter \
-  --version "$KARPENTER_CHART_VERSION" \
-  --namespace karpenter \
-  --create-namespace \
-  --set clusterName="$EKS_CLUSTER_NAME" \
-  --set clusterEndpoint=$(aws eks describe-cluster \
-    --name "$EKS_CLUSTER_NAME" \
-    --region "$AWS_REGION" \
-    --query "cluster.endpoint" --output text)
-```
-
-Expected: `kubectl -n karpenter get pods` shows the controller running.
-
-Important: the original command contained a typo (`$CLUSTERz` and a stray
-backtick). Use the corrected version above.
-
 ## Scaling Demo (Workload Pressure)
 
 Create `gitops/apps/inflate/inflate.yaml`:
@@ -584,7 +578,7 @@ extraScrapeConfigs: |
       - role: endpoints
         namespaces:
           names:
-            - kube-system
+            - karpenter
     relabel_configs:
       - source_labels:
           - __meta_kubernetes_endpoints_name
